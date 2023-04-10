@@ -8,6 +8,7 @@ import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
+import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -55,6 +56,10 @@ public class LineChartRenderer extends LineRadarRenderer {
 
     protected Path cubicPath = new Path();
     protected Path cubicFillPath = new Path();
+
+    //两个画笔用于绘制内圆和外部圆环 作者出处：https://juejin.cn/post/7130828119010705438
+    private final Paint mHighlightPointStokePaint = new Paint();
+    private final Paint mHighlightPointInnerPaint = new Paint();
 
     public LineChartRenderer(LineDataProvider chart, ChartAnimator animator,
                              ViewPortHandler viewPortHandler) {
@@ -699,7 +704,7 @@ public class LineChartRenderer extends LineRadarRenderer {
     @Override
     public void drawHighlighted(Canvas c, Highlight[] indices) {
 
-        LineData lineData = mChart.getLineData();
+      /*  LineData lineData = mChart.getLineData();
 
         for (Highlight high : indices) {
 
@@ -720,7 +725,75 @@ public class LineChartRenderer extends LineRadarRenderer {
 
             // draw the lines
             drawHighlightLines(c, (float) pix.x, (float) pix.y, set);
+        }*/
+
+        LineData lineData = mChart.getLineData();
+        int entryIndex = -1;
+
+        for (Highlight high : indices) {
+
+            ILineDataSet set = lineData.getDataSetByIndex(high.getDataSetIndex());
+
+            if (set == null || !set.isHighlightEnabled())
+                continue;
+
+            Entry e = set.getEntryForXValue(high.getX(), high.getY());
+
+            if (!isInBoundsX(e, set))
+                continue;
+
+            //记录点击索引
+            entryIndex = set.getEntryIndex(e);
+            MPPointD pix = mChart.getTransformer(set.getAxisDependency()).getPixelForValues(e.getX(), e.getY() * mAnimator
+                    .getPhaseY());
+
+            high.setDraw((float) pix.x, (float) pix.y);
+
+            // draw the lines
+            drawHighlightLines(c, (float) pix.x, (float) pix.y, set);
         }
+
+        if (entryIndex < 0) {
+            return;
+        }
+
+        if (mChart instanceof BarLineChartBase) {
+            BarLineChartBase chart = (BarLineChartBase) this.mChart;
+            if (chart.isDrawHighlightPoint()) {
+                mHighlightPointInnerPaint.reset();
+                mHighlightPointInnerPaint.setAntiAlias(true);
+                mHighlightPointInnerPaint.setStyle(Paint.Style.FILL);
+
+                //交点外圈白环
+                mHighlightPointStokePaint.reset();
+                mHighlightPointStokePaint.setAntiAlias(true);
+                mHighlightPointStokePaint.setStyle(Paint.Style.STROKE);
+                mHighlightPointStokePaint.setStrokeWidth(chart.getHighLightPointStrokeWidth());
+                mHighlightPointStokePaint.setColor(Color.WHITE);
+
+                List<ILineDataSet> dataSets = lineData.getDataSets();
+                for (ILineDataSet set : dataSets) {
+                    //遍历所有dataset
+                    if (entryIndex < set.getEntryCount()) {
+                        //避免数组越位
+                        Entry e = set.getEntryForIndex(entryIndex);
+                        MPPointD pix = mChart.getTransformer(set.getAxisDependency())
+                                .getPixelForValues(e.getX(), e.getY() * mAnimator.getPhaseY());
+
+                        drawHighlightPoint(c, (float) pix.x, (float) pix.y, chart, set);
+                    }
+                }
+            }
+        }
+    }
+
+    private void drawHighlightPoint(Canvas c, float x, float y, BarLineChartBase chart, ILineDataSet set) {
+        //点内圆的颜色和图表线条一致，且将颜色的不透明度调满！
+        mHighlightPointInnerPaint.setColor(((255) << 24) | set.getColor());
+        //绘制内圆
+        c.drawCircle(x, y, chart.getHighLightPointInnerRadius(), mHighlightPointInnerPaint);
+        //绘制外圆
+        c.drawCircle(x, y, chart.getHighLightPointInnerRadius(), mHighlightPointStokePaint);
     }
 
     /**

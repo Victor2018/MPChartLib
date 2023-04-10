@@ -14,6 +14,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //绘制高亮线交点
+        mLineChart.isDrawHighlightPoint = true;
+        mLineChart.highLightPointInnerRadius = DensityUtil.dip2px(this,5f)
+        mLineChart.highLightPointStrokeWidth = DensityUtil.dip2px(this,5f)
+
         mLineChartManager = LineChartManager(mLineChart)
         mLineChartManager?.clearData()
 
@@ -44,6 +49,6 @@ class MainActivity : AppCompatActivity() {
         yValues.add(y1Values)
         yValues.add(y2Values)
 
-        mLineChartManager?.showDatas(lineNames,lineColors,xValues,yValues,xTitles)
+        mLineChartManager?.showDatas(lineNames,lineColors,xValues,yValues,xTitles,false)
     }
 }

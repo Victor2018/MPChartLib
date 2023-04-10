@@ -86,6 +86,7 @@ class LineChartManager(var lineChart: LineChart?) {
         xAxis?.setDrawAxisLine(false)
         xAxis?.setDrawGridLines(false)//取消x轴网格线
         xAxis?.setDrawLabels(true)//X轴刻度
+        xAxis?.axisMinimum = 0f
 
         //保证Y轴从0开始，不然会上移一点
         leftAxis?.axisMinimum = 0f
@@ -119,7 +120,7 @@ class LineChartManager(var lineChart: LineChart?) {
     }
 
     fun showDatas (lineNames: ArrayList<String>,lineColors: ArrayList<Int>,xValues: ArrayList<Int>,
-                   yValues: ArrayList<ArrayList<Float>>,xTitleValues: ArrayList<String>) {
+                   yValues: ArrayList<ArrayList<Float>>,xTitleValues: ArrayList<String>,isDashedLine: Boolean) {
         this.xTitles = xTitleValues
         setXAxisValueFormatter()
         var lineNamesSize = lineNames.size
@@ -139,7 +140,7 @@ class LineChartManager(var lineChart: LineChart?) {
                 values.add(Entry(xValues[j].toFloat(), fl))
             }
 
-            var lineDataSet = getLineDataSet(values,lineNames[i],lineColors[i])
+            var lineDataSet = getLineDataSet(values,lineNames[i],lineColors[i],isDashedLine)
             dataSets.add(lineDataSet)
         }
 
@@ -149,8 +150,13 @@ class LineChartManager(var lineChart: LineChart?) {
         lineChart?.animateX(1000)
     }
 
-    fun getLineDataSet(values: ArrayList<Entry>,name: String?,color: Int): LineDataSet {
+    fun getLineDataSet(values: ArrayList<Entry>,name: String?,color: Int,isDashedLine: Boolean): LineDataSet {
         var lineDataSet = LineDataSet(values, name)
+        if (isDashedLine) {
+            //设置折线为虚线
+            lineDataSet.enableDashedLine(20f, 20f, 0f)
+            lineDataSet.enableDashedHighlightLine(10f, 5f, 0f)
+        }
         //设置折线的粗细
         lineDataSet?.lineWidth = 1.5f
         //设置折线上的圆点的大小
@@ -170,10 +176,12 @@ class LineChartManager(var lineChart: LineChart?) {
         lineDataSet?.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
         lineDataSet?.axisDependency = YAxis.AxisDependency.LEFT
         lineDataSet?.valueTextSize = 10f
+
+        lineDataSet?.setDrawHighlightIndicators(false)
         //取消横向辅助线
         lineDataSet?.setDrawHighlightIndicators(false)
         //取消纵向辅助线
-        lineDataSet?.setDrawVerticalHighlightIndicator(false)
+        lineDataSet?.setDrawVerticalHighlightIndicator(true)
 
         return lineDataSet
     }
