@@ -826,4 +826,26 @@ public abstract class AxisBase extends ComponentBase {
     public boolean isDrawScale() {
         return mIsDrawScale;
     }
+
+    /**
+     * 默认绘制刻度在X轴外侧
+     */
+    protected boolean mIsDrawScaleOnXOutside = true;
+
+    public void setDrawScaleOnXOutside(boolean isDrawScaleOnXOutside) {
+        this.mIsDrawScaleOnXOutside = isDrawScaleOnXOutside;
+    }
+    public boolean isDrawScaleOnXOutside() {
+        return mIsDrawScaleOnXOutside;
+    }
+
+    private float scaleOffsetBottom;
+
+    public void setScaleOffsetBottom(float scaleOffsetBottom) {
+        this.scaleOffsetBottom = scaleOffsetBottom;
+    }
+
+    public float getScaleOffsetBottom() {
+        return scaleOffsetBottom;
+    }
 }

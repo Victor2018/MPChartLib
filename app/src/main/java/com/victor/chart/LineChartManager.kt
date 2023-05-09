@@ -2,6 +2,7 @@ package com.victor.chart
 
 import android.graphics.Color
 import android.util.Log
+import android.widget.Toast
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.Legend
@@ -86,11 +87,14 @@ class LineChartManager(var lineChart: LineChart?) {
         xAxis?.setDrawAxisLine(false)
         xAxis?.setDrawGridLines(false)//取消x轴网格线
         xAxis?.setDrawLabels(true)//X轴刻度
-        xAxis?.axisMinimum = 0f
+//        xAxis?.axisMinimum = 0f
 
         //保证Y轴从0开始，不然会上移一点
         leftAxis?.axisMinimum = 0f
         rightAxis?.axisMinimum = 0f
+
+//        xAxis?.isDrawScaleOnXOutside = false
+//        xAxis?.scaleOffsetBottom = 20f
 
         leftAxis?.setDrawAxisLine(false)
         rightAxis?.setDrawAxisLine(false)

@@ -429,22 +429,30 @@ public class XAxisRenderer extends AxisRenderer {
     boolean isDrawShortLine = false;
     protected void drawScale(Canvas canvas, float startX, float offset) {
         float topY = mViewPortHandler.contentTop(); //顶部X轴所在的位置
-        float bottomY = mViewPortHandler.contentBottom(); //底部X轴所在的位置
+        float bottomY = mViewPortHandler.contentBottom() - mXAxis.getScaleOffsetBottom(); //底部X轴所在的位置
         canvas.save();
         if (mXAxis.getPosition() == XAxisPosition.BOTTOM) { //X轴位置在下方时
             for (int i = 0; i <= 5; i++) {
                 canvas.save();
                 canvas.translate(offset * i, 0);
                 if (i % 5 == 0) {
-                    //刻度线在图表内部
-//                    canvas.drawLine(startX, bottomY - 20, startX, bottomY, mAxisLinePaint);//画长刻度线
-                    //刻度线在图表外面
-                    canvas.drawLine(startX, bottomY + 20, startX, bottomY, mAxisLinePaint);//画长刻度线
+
+                    if (mXAxis.isDrawScaleOnXOutside()) {
+                        //刻度线在图表外面
+                        canvas.drawLine(startX, bottomY + 20, startX, bottomY, mAxisLinePaint);//画长刻度线
+                    } else  {
+                        //刻度线在图表内部
+                        canvas.drawLine(startX, bottomY - 20, startX, bottomY, mAxisLinePaint);//画长刻度线
+                    }
                 } else if (isDrawShortLine) {
-                    //刻度线在图表内部
-//                    canvas.drawLine(startX, bottomY - 10, startX, bottomY, mAxisLinePaint);//画短刻度线
-                    //刻度线在图表外面
-                    canvas.drawLine(startX, bottomY + 10, startX, bottomY, mAxisLinePaint);//画短刻度线
+                    if (mXAxis.isDrawScaleOnXOutside()) {
+                        //刻度线在图表外面
+                        canvas.drawLine(startX, bottomY + 10, startX, bottomY, mAxisLinePaint);//画短刻度线
+                    } else {
+                        //刻度线在图表内部
+                        canvas.drawLine(startX, bottomY - 10, startX, bottomY, mAxisLinePaint);//画短刻度线
+                    }
+
                 }
                 canvas.restore();
             }

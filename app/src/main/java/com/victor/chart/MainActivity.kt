@@ -31,8 +31,8 @@ class MainActivity : AppCompatActivity() {
         for (i in 0 until 20) {
             xValues.add(i + 1)
             xTitles.add("08-${20 + i}星期天")
-            var totalFindCount = Random(100 - 10 * i).nextFloat()
-            var totalAddCount = Random(1000 - 100 * i).nextFloat()
+            var totalFindCount = Random(100 - 10 * i).nextFloat() * 1f
+            var totalAddCount = Random(100 - 100 * i).nextFloat() * 1f
 
             y1Values.add(totalFindCount)
             y2Values.add(totalAddCount)
